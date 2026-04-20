@@ -3,8 +3,8 @@ biome.py
 =========
 Implements a "game of life" simulated biome
 
-| Seth McNeill
-| 2026 March 19
+| Collin, Eein, Kade, Tobias
+| 2026 April 20
 """
 
 from random import choices, random
