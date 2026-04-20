@@ -30,18 +30,10 @@ class Organism:
 
 class Biome:
     def __init__(self, nRows=5, nCols=3, startEnergy=100):
-        self.grid = []
         self.rows = nRows
         self.cols = nCols
-        for ii in range(self.rows):
-            newRow = []
-            for jj in range(self.cols):
-                if random() < 0.5:  # fill half the spaces on average
-                    newOrg = Organism(startEnergy)
-                else:
-                    newOrg = ''
-                newRow.append(newOrg)
-            self.grid.append(newRow)
+        #List Comprehension Grid
+        self.grid = [[ Organism(startEnergy) if random() > .5 else "" for _ in range(self.cols)] for _ in range(self.rows)]
         self.cycleCount = 0
         # print("Biome initialized")
     
