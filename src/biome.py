@@ -1,5 +1,5 @@
 """
-life.py
+biome.py
 ====================================
 Game of life project with custom rules
 
