@@ -7,7 +7,7 @@ Game of life project with custom rules
 | Date: 2026 April 20
 """
 
-from random import choices, random
+from random import choices, random, randint
 
 
 class Organism:
@@ -32,6 +32,7 @@ class Organism:
         Tells if the organism is alive
     """
     dnaOptions = ['🌱','💧','🌞','🎄','🍊']
+    dnaCombust = ["🌱🌱🌱","💧💧💧","🌞🌞🌞","🎄🎄🎄","🍊🍊🍊"]
 
     def __init__(self, energy=100):
         """
@@ -50,9 +51,20 @@ class Organism:
     
     def mutate(self):
         """
-        This allows the Organism to change its attribute, dna
+        This allows the Organism to change its dna and kills it is DNA is all the same
         """
-        pass
+        changingDna = randint(0,len(self.dna)-1)
+        newDna = ""
+        for x in range(len(self.dna)):
+            if x == changingDna:
+                newDna = newDna + self.dnaOptions[randint(0,len(self.dnaOptions)-1)]
+            else:
+                newDna = newDna + self.dna[x]
+        if newDna not in self.dnaCombust:
+            self.dna = newDna
+        else:
+            self.isAlive = False
+
 
     def consume(self, other):
         """
@@ -157,6 +169,8 @@ class Biome:
                     self.hydration(ii,jj)
                     # Solar flare rule
                     # Mutation rule
+                    if self.grid[ii][jj].energy < 5:
+                        self.grid[ii][jj].mutate()
                     # Predator rule
                     if self.grid[ii][jj].energy <= 0:  # organism ceases
                         self.grid[ii][jj] = ''
@@ -180,7 +194,7 @@ def main():
     """
     # o1 = Organism()
     # print(o1)
-    myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
+    myBiome = Biome(nRows=5, nCols=3, startEnergy=6)
     myBiome.display()
     for ii in range(5):
         myBiome.step()
