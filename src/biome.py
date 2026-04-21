@@ -5,7 +5,7 @@ Game of life project with custom rules
 
 | Author: Collin, Eein, Kade, Tobias
 | Date: 2026 April 20
-test test
+
 """
 
 from random import choices, random
@@ -44,10 +44,18 @@ class Organism:
             The amount of energy the organism starts with. Default is 100.
 
         """
-        # print("Organism initialized")
-        self.dna = choices(Organism.dnaOptions, k=3)
-        self.energy = energy
-        self.isAlive = True
+        try:
+            if energy < 0:
+                raise ValueError("Energy cannot be negative")
+
+            self.dna = choices(Organism.dnaOptions, k=3)
+            self.energy = energy
+            self.isAlive = True
+
+        except ValueError as e:
+            print(f"Error creating organism: {e}")
+            self.energy = 0
+            self.isAlive = False
     
     def mutate(self):
         """
@@ -129,19 +137,25 @@ class Biome:
         column: int
             The column in which the hydration rule is used
         """
-        if '💧' in self.grid[row][column].dna:
-            print(f'[{row},{column}] has water')
-            if row > 0:  # can check above
-                if self.grid[row-1][column] == '':
-                    self.grid[row-1][column] = Organism()
-                    self.grid[row][column].energy = self.grid[row][column].energy/2 
-            if row < (self.rows - 1):  # can check below
-                pass
-            if column > 0:  # can check left
-                pass
-            if column < (self.cols - 1):  # can check right
-                pass
-    
+        try:
+            if '💧' in self.grid[row][column].dna:
+                print(f'[{row},{column}] has water')
+                if row > 0:  # can check above
+                    if self.grid[row-1][column] == '':
+                        self.grid[row-1][column] = Organism()
+                        self.grid[row][column].energy = self.grid[row][column].energy/2 
+                if row < (self.rows - 1):  # can check below
+                    pass
+                if column > 0:  # can check left
+                    pass
+                if column < (self.cols - 1):  # can check right
+                    pass
+        except AttributeError:
+            print(f"Invalid organism at [{row},{column}]")
+
+        except IndexError:
+            print(f"Out of bounds access at [{row},{column}]")
+
     def step(self):
         """
         Implementation of all rules and reducing the energy of all Organisms
@@ -152,16 +166,20 @@ class Biome:
         # go through all the organisms
         for ii in range(len(self.grid)):
             for jj in range(len(self.grid[ii])):
-                if self.grid[ii][jj] != '':  # make sure something is there
-                    self.grid[ii][jj].energy -=1
-                    # Hydration rule
-                    self.hydration(ii,jj)
-                    # Solar flare rule
-                    # Mutation rule
-                    # Predator rule
-                    if self.grid[ii][jj].energy <= 0:  # organism ceases
-                        self.grid[ii][jj] = ''
-                        print(f'Organism at [{ii},{jj}] ceased')
+                try:
+                    if self.grid[ii][jj] != '':  # make sure something is there
+                        self.grid[ii][jj].energy -=1
+                        # Hydration rule
+                        self.hydration(ii,jj)
+                        # Solar flare rule
+                        # Mutation rule
+                        # Predator rule
+                        if self.grid[ii][jj].energy <= 0:  # organism ceases
+                            self.grid[ii][jj] = ''
+                            print(f'Organism at [{ii},{jj}] ceased')
+                except Exception as e:
+                    print(f"Error at [{ii},{jj}]: {e}")
+
         self.display()
     
     def display(self):
@@ -181,7 +199,11 @@ def main():
     """
     # o1 = Organism()
     # print(o1)
+
     myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
+    myBiome.grid[0][0] = "not an organism"
+    myBiome.hydration(100, 100)
+
     myBiome.display()
     for ii in range(5):
         myBiome.step()
