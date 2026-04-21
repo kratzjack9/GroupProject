@@ -1,10 +1,10 @@
 """
-hello.py
+life.py
 ====================================
-This is an example file with correct docstring examples
+Game of life project with custom rules
 
-| Author: Seth McNeill
-| Date: 2025 September 07
+| Author: Collin, Eein, Kade, Tobias
+| Date: 2026 April 20
 """
 
 class SayHello:
