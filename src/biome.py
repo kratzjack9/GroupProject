@@ -5,6 +5,7 @@ Game of life project with custom rules
 
 | Author: Collin, Eein, Kade, Tobias
 | Date: 2026 April 20
+test test
 """
 
 from random import choices, random
