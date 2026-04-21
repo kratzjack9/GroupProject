@@ -6,10 +6,10 @@
 Life Project documentation
 ==========================
 
-CHANGE THE NAME OF THE MODULE hello BELOW AFTER YOU CHANGE THE NAME OF hello.py TO MATCH YOUR PROJECT!
-Then you can change these documentation lines
+A game of life simulation with more rules. This simulation has aspects of eating other organisms and energy consumption. 
+It takes place on a finite grid that could be manipulated to change sizes.
 
-.. automodule:: life
+.. automodule:: biome
    :members:
    :undoc-members:
    :show-inheritance:
