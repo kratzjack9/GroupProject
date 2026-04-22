@@ -137,7 +137,7 @@ class Biome:
     
     def hydration(self, row, column):
         """
-        Implements the hydration rule at location row,column
+        Implements the hydration rule at location row, column
         
         Parameters
         ------------
@@ -181,6 +181,44 @@ class Biome:
             if "E" in directionList:
                 self.grid[row][column+1] = Organism(energy=self.grid[row][column].energy)
 
+    def predator(self,row,column):
+        """
+        Implements the predator rule at location row, column
+
+        Parameters
+        --------------
+        row : int
+            The row in which the predator rule is activated on
+
+        column : int
+            The row in which the predator rule is activated on
+        """
+        isPredator = False
+        dnaSequence = {"main":[row,column,{}],"N":[row-1,column,{}],"S":[row+1,column,{}],"W":[row,column-1,{}],"E":[row,column+1,{}]}
+        for dnaComponent in self.grid[row][column].dna:
+            if dnaComponent not in dnaSequence["main"]:
+                dnaSequence["main"][dnaComponent] = 1
+            else:
+                dnaSequence["main"][dnaComponent] = dnaSequence["main"][dnaComponent] + 1
+        for key in dnaSequence:
+            isPredator = True
+        directionNoGo = []
+        if isPredator:
+            if row == 0: # Top Row
+                directionNoGo.append("N")
+            if row == self.rows - 1: # Bottom Row
+                directionNoGo.append("S")
+            if column == 0: # Left Column
+                directionNoGo.append("W")
+            if column == 0: # Right Column
+                directionNoGo.append("E")
+            
+                
+
+
+        
+
+
     
     def step(self):
         """
@@ -201,6 +239,8 @@ class Biome:
                     if self.grid[ii][jj].energy < 5:
                         self.grid[ii][jj].mutate()
                     # Predator rule
+                    self.predator(ii,jj)
+                    #Energy Death
                     if self.grid[ii][jj].energy <= 0:  # organism ceases
                         self.grid[ii][jj] = ''
                         print(f'Organism at [{ii},{jj}] ceased')
