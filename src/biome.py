@@ -145,7 +145,7 @@ class Biome:
         """
         directionList = []
         if '💧' in self.grid[row][column].dna:
-            #print(f'[{row},{column}] has water')
+            print(f'[{row},{column}] has water')
             if row > 0:  # can check above
                 if self.grid[row-1][column] == '':
                     # 30% Chance
@@ -200,6 +200,10 @@ class Biome:
                     if self.grid[ii][jj].energy <= 0:  # organism ceases
                         self.grid[ii][jj] = ''
                         print(f'Organism at [{ii},{jj}] ceased')
+                    if not self.grid[ii][jj].isAlive: #if organism is not alive, needs to disappear
+                        self.grid[ii][jj] = ''
+                        print(f'Organism at [{ii},{jj}] ceased')
+
         self.display()
     
     def display(self):
