@@ -194,13 +194,18 @@ class Biome:
             The row in which the predator rule is activated on
         """
         isPredator = False
-        dnaSequence = {"main":[row,column,{}],"N":[row-1,column,{}],"S":[row+1,column,{}],"W":[row,column-1,{}],"E":[row,column+1,{}]}
-        for dnaComponent in self.grid[row][column].dna:
-            if dnaComponent not in dnaSequence["main"]:
-                dnaSequence["main"][dnaComponent] = 1
-            else:
-                dnaSequence["main"][dnaComponent] = dnaSequence["main"][dnaComponent] + 1
+        #DNA sequence understanding: 
+        #Spot in grid:[row of spot,column of spot, {dictionary of dna}, isPredator]
+        dnaSequence = {"center":[row,column,{},False],"N":[row-1,column,{},False],"S":[row+1,column,{},False],"W":[row,column-1,{},False],"E":[row,column+1,{},False]}
         for key in dnaSequence:
+            if dnaSequence[key][0] >= 0 and dnaSequence[key][0] <= self.rows-1 and dnaSequence[key][1] >= 0 and dnaSequence[key][0] <= self.cols: #Make sure spot is in grid
+                for dnaComponent in self.grid[dnaSequence[key][0]][dnaSequence[key][1]].dna:
+                    if dnaComponent not in dnaSequence[key][3]:
+                        dnaSequence[key][3][dnaComponent] = 1
+                    else:
+                        dnaSequence[key][3][dnaComponent] = dnaSequence[key][3][dnaComponent] + 1
+        for key in dnaSequence:
+
             isPredator = True
         directionNoGo = []
         if isPredator:
