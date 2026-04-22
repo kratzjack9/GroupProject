@@ -30,6 +30,9 @@ class Organism:
 
     isAlive : boolean
         Tells if the organism is alive
+
+    isNewOrganism : boolean
+        Tells if the organism was just born to prevent rules applying immediately
     """
     dnaOptions = ['🌱','💧','🌞','🎄','🍊']
     dnaCombust = ["🌱🌱🌱","💧💧💧","🌞🌞🌞","🎄🎄🎄","🍊🍊🍊"]
@@ -51,6 +54,7 @@ class Organism:
         else:
             self.isAlive = True
         self.energy = energy
+        self.isNewOrganism = True
     
     def mutate(self):
         """
@@ -145,7 +149,7 @@ class Biome:
         """
         directionList = []
         if '💧' in self.grid[row][column].dna:
-            print(f'[{row},{column}] has water')
+            #print(f'[{row},{column}] has water')
             if row > 0:  # can check above
                 if self.grid[row-1][column] == '':
                     # 30% Chance
@@ -167,7 +171,7 @@ class Biome:
                     if random() < .3 :
                         directionList.append("E")
             if len(directionList) != 0:
-                self.grid[row][column].energy = (self.grid[row][column].energy)/len(directionList)
+                self.grid[row][column].energy = (self.grid[row][column].energy)/(len(directionList)+1)
             if "N" in directionList:
                 self.grid[row-1][column] = Organism(energy=self.grid[row][column].energy)
             if "S" in directionList:
@@ -188,7 +192,7 @@ class Biome:
         # go through all the organisms
         for ii in range(len(self.grid)):
             for jj in range(len(self.grid[ii])):
-                if self.grid[ii][jj] != '':  # make sure something is there
+                if self.grid[ii][jj] != '' and not self.grid[ii][jj].isNewOrganism:  # make sure something is there and new organism don't immediately get rules applied
                     self.grid[ii][jj].energy -=1
                     # Hydration rule
                     self.hydration(ii,jj)
@@ -203,6 +207,10 @@ class Biome:
                     if not self.grid[ii][jj].isAlive: #if organism is not alive, needs to disappear
                         self.grid[ii][jj] = ''
                         print(f'Organism at [{ii},{jj}] ceased')
+        for ii in range(self.rows):
+            for jj in range(self.cols):
+                if self.grid[ii][jj] != "" and self.grid[ii][jj].isNewOrganism:
+                    self.grid[ii][jj].isNewOrganism = False
 
         self.display()
     
@@ -221,11 +229,10 @@ def main():
     """
     The primary running of the code
     """
-    # o1 = Organism()
-    # print(o1)
+
     myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
-    myBiome.display()
-    for ii in range(5):
+    #myBiome.display()
+    for ii in range(10):
         myBiome.step()
 
 
