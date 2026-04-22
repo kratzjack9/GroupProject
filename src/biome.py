@@ -46,8 +46,11 @@ class Organism:
         """
         # print("Organism initialized")
         self.dna = choices(Organism.dnaOptions, k=3)
+        if self.dna in self.dnaCombust:
+            self.isAlive = False
+        else:
+            self.isAlive = True
         self.energy = energy
-        self.isAlive = True
     
     def mutate(self):
         """
@@ -135,23 +138,45 @@ class Biome:
         Parameters
         ------------
         row : int 
-            The row in which the hydration rule is used
+            The row in which the hydration rule is activated on
 
         column: int
-            The column in which the hydration rule is used
+            The column in which the hydration rule is activated on
         """
+        directionList = []
         if '💧' in self.grid[row][column].dna:
-            print(f'[{row},{column}] has water')
+            #print(f'[{row},{column}] has water')
             if row > 0:  # can check above
                 if self.grid[row-1][column] == '':
-                    self.grid[row-1][column] = Organism()
-                    self.grid[row][column].energy = self.grid[row][column].energy/2 
+                    # 30% Chance
+                    if random() < .3 :
+                        directionList.append("N")
             if row < (self.rows - 1):  # can check below
-                pass
+                if self.grid[row+1][column] == "":
+                    # 30% Chance
+                    if random() < .3 :
+                        directionList.append("S")
             if column > 0:  # can check left
-                pass
+                if self.grid[row][column-1] == "":
+                    # 30% Chance
+                    if random() < .3 : 
+                        directionList.append("W")
             if column < (self.cols - 1):  # can check right
-                pass
+                if self.grid[row][column+1] == "":
+                    # 30% Chance
+                    if random() < .3 :
+                        directionList.append("E")
+            if len(directionList) != 0:
+                self.grid[row][column].energy = (self.grid[row][column].energy)/len(directionList)
+            if "N" in directionList:
+                self.grid[row-1][column] = Organism(energy=self.grid[row][column].energy)
+            if "S" in directionList:
+                self.grid[row+1][column] = Organism(energy=self.grid[row][column].energy)
+            if "W" in directionList:
+                self.grid[row][column-1] = Organism(energy=self.grid[row][column].energy)
+            if "E" in directionList:
+                self.grid[row][column+1] = Organism(energy=self.grid[row][column].energy)
+
     
     def step(self):
         """
@@ -194,7 +219,7 @@ def main():
     """
     # o1 = Organism()
     # print(o1)
-    myBiome = Biome(nRows=5, nCols=3, startEnergy=6)
+    myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
     myBiome.display()
     for ii in range(5):
         myBiome.step()
