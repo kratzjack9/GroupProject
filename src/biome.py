@@ -73,12 +73,6 @@ class Organism:
             self.isAlive = False
 
 
-    def consume(self, other):
-        """
-        This allows an Organism to eat another Organism to gain energy
-        """
-        pass
-
     def __str__(self):
         """
         The string returned when the Organism is a method that requires a string
@@ -181,7 +175,7 @@ class Biome:
             if "E" in directionList:
                 self.grid[row][column+1] = Organism(energy=self.grid[row][column].energy)
 
-    def predator(self,row,column):
+    def predator(self,row,column,killing=True):
         """
         Implements the predator rule at location row, column
 
@@ -261,24 +255,40 @@ class Biome:
             if len(avaliableDirections) != 0:
                 killingDirection = avaliableDirections[randint(0,len(avaliableDirections)-1)]
             else:
-                #If an avaliable direction still is avaliable
+                #If no avaliable direction is avaliable
                 killingDirection = ""
             # Attacking
             if killingDirection == "N":
-                self.grid[row-1][column] = ""
-                print(f"[{row-1},{column}] died from predator {self.grid[row-1][column]}")
+                if killing == True:
+                    self.grid[row-1][column] = ""
+                    print(f"[{row-1},{column}] died from predator [{row},{column}]")
+                else:
+                    self.grid[row-1][column].energy -= 5
+                    print(f"[{row-1},{column}] was attacked from predator [{row},{column}]")
                 self.grid[row][column].energy += 5
             if killingDirection == "S":
-                self.grid[row+1][column] = ""
-                print(f"[{row+1},{column}] died from predator {self.grid[row+1][column]}")
+                if killing == True:
+                    self.grid[row+1][column] = ""
+                    print(f"[{row+1},{column}] died from predator [{row},{column}]")
+                else:
+                    self.grid[row+1][column].energy -= 5
+                    print(f"[{row+1},{column}] was attacked from predator [{row},{column}]")
                 self.grid[row][column].energy += 5
             if killingDirection == "W":
-                self.grid[row][column-1] = ""
-                print(f"[{row},{column-1}] died from predator {self.grid[row][column-1]}")
+                if killing == True:
+                    self.grid[row][column-1] = ""
+                    print(f"[{row},{column-1}] died from predator [{row},{column}]")
+                else:
+                    self.grid[row][column-1].energy -= 5
+                    print(f"[{row},{column-1}] was attacked from predator [{row},{column}]")
                 self.grid[row][column].energy += 5
             if killingDirection == "E":
-                self.grid[row][column+1] = ""
-                print(f"[{row},{column+1}] died from predator {self.grid[row][column+1]}")
+                if killing == True:
+                    self.grid[row][column+1] = ""
+                    print(f"[{row},{column+1}] died from predator [{row},{column}]")
+                else:
+                    self.grid[row][column+1].energy -= 5
+                    print(f"[{row},{column+1}] was attacked from predator [{row},{column}]")
                 self.grid[row][column].energy += 5
                 
     def combust(self,row,column):
@@ -331,12 +341,9 @@ class Biome:
                     if self.grid[ii][jj].energy < 5:
                         self.grid[ii][jj].mutate()
                     # Predator rule
-                    self.predator(ii,jj)
+                    self.predator(ii,jj,killing=False)
                     #Energy Death
-                    if self.grid[ii][jj].energy <= 0:  # organism ceases
-                        self.grid[ii][jj] = ''
-                        print(f'Organism at [{ii},{jj}] ceased')
-                    if not self.grid[ii][jj].isAlive: #if organism is not alive, needs to disappear
+                    if self.grid[ii][jj].energy <= 0 or not self.grid[ii][jj].isAlive:  # organism ceases
                         self.grid[ii][jj] = ''
                         print(f'Organism at [{ii},{jj}] ceased')
         for ii in range(self.rows):
