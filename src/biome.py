@@ -198,8 +198,8 @@ class Biome:
         #Spot in grid:[row of spot,column of spot, {dictionary of dna}, isPredator, exist]
         dnaSequence = {"center":[row,column,{},False,True],"N":[row-1,column,{},False,False],"S":[row+1,column,{},False,False],"W":[row,column-1,{},False,False],"E":[row,column+1,{},False,False]}
         for key in dnaSequence:
-            if dnaSequence[key][0] >= 0 and dnaSequence[key][0] <= self.rows-1 and dnaSequence[key][1] >= 0 and dnaSequence[key][1] <= self.cols-1: #Make sure spot is in grid and nonempty
-                if self.grid[dnaSequence[key][0]][dnaSequence[key][1]] != "":
+            if dnaSequence[key][0] >= 0 and dnaSequence[key][0] <= self.rows-1 and dnaSequence[key][1] >= 0 and dnaSequence[key][1] <= self.cols-1: #Make sure spot is in grid
+                if self.grid[dnaSequence[key][0]][dnaSequence[key][1]] != "": #Makes sure spot is nonempty
                     dnaSequence[key][4] = True
                     for dnaComponent in self.grid[dnaSequence[key][0]][dnaSequence[key][1]].dna:
                         if dnaComponent not in dnaSequence[key][2]:
@@ -213,32 +213,57 @@ class Biome:
                     dnaSequence[key][3] = True
         #Finds which directions are not available due to being predators, that grid spot is not there, or isNewOrganism
         directionNoGo = {}
-        if dnaSequence["center"][3]:
+        if dnaSequence["center"][3]: # Checks if center is predator
             for key in dnaSequence:
-                if key != "center":
-                    if dnaSequence[key][3]:
-                        if directionNoGo.get(key) != None:
+                if key != "center": # Looks at surrounding spots
+                    if dnaSequence[key][3]: # Sees if surrounding spot is predator
+                        if directionNoGo.get(key) != None: #If true, doesn't attack
                             directionNoGo[key] =+ 1
-                if not dnaSequence[key][4]:
-                    if directionNoGo.get(key) != None:
+                        else:
+                            directionNoGo[key] = 1
+                if not dnaSequence[key][4]: # Sees if spot has an organism
+                    if directionNoGo.get(key) != None: # If not, doesn't attack
                         directionNoGo[key] =+ 1
+                    else:
+                        directionNoGo[key] = 1
+                else:
+                    if self.grid[dnaSequence[key][0]][dnaSequence[key][1]].isNewOrganism: # Sees if new organism
+                        if directionNoGo.get(key) != None: # If so, doesn't attack
+                            directionNoGo[key] =+ 1
+                        else:
+                            directionNoGo[key] = 1
+            # Checks any of the edge cases            
             if row == 0:
                 if directionNoGo.get("N") != None:
                     directionNoGo["N"] =+ 1
+                else:
+                    directionNoGo["N"] = 1
             if row == self.rows - 1:
                 if directionNoGo.get("S") != None:
                     directionNoGo["S"] =+ 1
+                else:
+                    directionNoGo["S"] = 1
             if column == 0:
                 if directionNoGo.get("W") != None:
                     directionNoGo["W"] =+ 1
+                else:
+                    directionNoGo["W"] = 1
             if column == self.cols - 1:
                 if directionNoGo.get("E") != None:
                     directionNoGo["E"] =+ 1
+                else:
+                    directionNoGo["E"] = 1
+            # Determines what directions can be attacked
             avaliableDirections = ["N","S","W","E"]
             for direction in directionNoGo:
                 avaliableDirections.remove(direction)
+            # From these direction, one will be attacked
             if len(avaliableDirections) != 0:
                 killingDirection = avaliableDirections[randint(0,len(avaliableDirections)-1)]
+            else:
+                #If an avaliable direction still is avaliable
+                killingDirection = ""
+            # Attacking
             if killingDirection == "N":
                 self.grid[row-1][column] = ""
                 print(f"[{row-1},{column}] died from predator {self.grid[row-1][column]}")
