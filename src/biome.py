@@ -187,19 +187,10 @@ class Biome:
         column : int
             The row in which the predator rule is activated on
         """
-        isPredator = False
+
         #DNA sequence understanding: 
         #Spot in grid:[row of spot,column of spot, {dictionary of dna}, isPredator, exist]
-        dnaSequence = {"center":[row,column,{},False,True],"N":[row-1,column,{},False,False],"S":[row+1,column,{},False,False],"W":[row,column-1,{},False,False],"E":[row,column+1,{},False,False]}
-        for key in dnaSequence:
-            if dnaSequence[key][0] >= 0 and dnaSequence[key][0] <= self.rows-1 and dnaSequence[key][1] >= 0 and dnaSequence[key][1] <= self.cols-1: #Make sure spot is in grid
-                if self.grid[dnaSequence[key][0]][dnaSequence[key][1]] != "": #Makes sure spot is nonempty
-                    dnaSequence[key][4] = True
-                    for dnaComponent in self.grid[dnaSequence[key][0]][dnaSequence[key][1]].dna:
-                        if dnaComponent not in dnaSequence[key][2]:
-                            dnaSequence[key][2][dnaComponent] = 1
-                        else:
-                            dnaSequence[key][2][dnaComponent] = dnaSequence[key][2][dnaComponent] + 1
+        dnaSequence = self.infoCollector(row,column)
         #Finds which are predators
         for key in dnaSequence:
             for key2 in dnaSequence[key][2]:
@@ -257,7 +248,7 @@ class Biome:
             else:
                 #If no avaliable direction is avaliable
                 killingDirection = ""
-            # Attacking
+            # Attacking/Killing
             if killingDirection == "N":
                 if killing == True:
                     self.grid[row-1][column] = ""
@@ -290,6 +281,37 @@ class Biome:
                     self.grid[row][column+1].energy -= 5
                     print(f"[{row},{column+1}] was attacked from predator [{row},{column}]")
                 self.grid[row][column].energy += 5
+
+    def solarFlare(self,row,column):
+        """
+        Implements the Solar Flare rule at location row, column
+
+        Parameters
+        --------------
+        row : int
+            The row in which the Solar Flare rule is activated on
+
+        column : int
+            The row in which the Solar Flare rule is activated on
+        """
+        multiple5 = ""
+        for x in range(10):
+            multiple5.append((x+1)*5)
+        if self.cycleCount in multiple5:
+            #Spot in grid:[row of spot,column of spot, {dictionary of dna}, hasPlant, exist]
+            dnaSequence = self.infoCollector(row,column)
+            if "🌞" in dnaSequence["center"][3]:
+                # Checks if adjacent spots have a plant
+                for key in dnaSequence:
+                    if key != "center":
+                        if "🌱" in dnaSequence[key][3]:
+                            dnaSequence["center"][4] = True
+                # Depending if adjacent spots have plants, gains or loses 10 energy
+                if dnaSequence["center"][4]:
+                    self.grid[dnaSequence["center"][0]][dnaSequence["center"][1]].energy =+ 10
+                else:
+                    self.grid[dnaSequence["center"][0]][dnaSequence["center"][1]].energy =- 10
+
                 
     def combust(self,row,column):
         """
@@ -319,7 +341,35 @@ class Biome:
         else:
             return False
             
-                
+    def infoCollector(self,row,column):
+        """
+        Looks at the center and the surrounding spots and collects information about
+
+        Parameters
+        --------------
+        row : int
+            The row of the center
+
+        column : int
+            The column of the center
+
+        Return
+        -----------
+        dict
+            Holds row, column, information of DNA make up, room for rule specific use, and existing
+        """
+        #Spot in grid:[row of spot,column of spot, {dictionary of dna}, ruleSpecific, exist]
+        dnaSequence = {"center":[row,column,{},False,True],"N":[row-1,column,{},False,False],"S":[row+1,column,{},False,False],"W":[row,column-1,{},False,False],"E":[row,column+1,{},False,False]}
+        for key in dnaSequence:
+            if dnaSequence[key][0] >= 0 and dnaSequence[key][0] <= self.rows-1 and dnaSequence[key][1] >= 0 and dnaSequence[key][1] <= self.cols-1: #Make sure spot is in grid
+                if self.grid[dnaSequence[key][0]][dnaSequence[key][1]] != "": #Makes sure spot is nonempty
+                    dnaSequence[key][4] = True
+                    for dnaComponent in self.grid[dnaSequence[key][0]][dnaSequence[key][1]].dna:
+                        if dnaComponent not in dnaSequence[key][2]:
+                            dnaSequence[key][2][dnaComponent] = 1
+                        else:
+                            dnaSequence[key][2][dnaComponent] = dnaSequence[key][2][dnaComponent] + 1
+        return dnaSequence
     
     def step(self):
         """
