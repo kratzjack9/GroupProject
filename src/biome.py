@@ -277,6 +277,29 @@ class Biome:
                 self.grid[row][column+1] = ""
                 print(f"[{row},{column+1}] died from predator {self.grid[row][column+1]}")
                 
+    def combust(self,row,column):
+        """
+        Determines is an organism needs to combust
+        Happens when an organism has all the same components in DNA
+
+        Parameters
+        --------------
+        row : int
+            The row in which the combustion may take place
+
+        column : int
+            The column in which the combustion may take place
+
+        Returns
+        -----------
+        bool
+            Tells if the Organism has combusted
+        """
+        if self.grid[row][column].dna in self.grid[row][column].dnaCombust:
+            self.grid[row][column] = ""
+            return True
+        else:
+            return False
             
                 
     
