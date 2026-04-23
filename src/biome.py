@@ -267,15 +267,19 @@ class Biome:
             if killingDirection == "N":
                 self.grid[row-1][column] = ""
                 print(f"[{row-1},{column}] died from predator {self.grid[row-1][column]}")
+                self.grid[row][column].energy += 5
             if killingDirection == "S":
                 self.grid[row+1][column] = ""
                 print(f"[{row+1},{column}] died from predator {self.grid[row+1][column]}")
+                self.grid[row][column].energy += 5
             if killingDirection == "W":
                 self.grid[row][column-1] = ""
                 print(f"[{row},{column-1}] died from predator {self.grid[row][column-1]}")
+                self.grid[row][column].energy += 5
             if killingDirection == "E":
                 self.grid[row][column+1] = ""
                 print(f"[{row},{column+1}] died from predator {self.grid[row][column+1]}")
+                self.grid[row][column].energy += 5
                 
     def combust(self,row,column):
         """
@@ -295,8 +299,12 @@ class Biome:
         bool
             Tells if the Organism has combusted
         """
-        if self.grid[row][column].dna in self.grid[row][column].dnaCombust:
+        dnaString = ""
+        for component in self.grid[row][column].dna:
+            dnaString = dnaString + component
+        if dnaString in self.grid[row][column].dnaCombust:
             self.grid[row][column] = ""
+            print(f"[{row},{column}] has combust")
             return True
         else:
             return False
@@ -313,7 +321,8 @@ class Biome:
         # go through all the organisms
         for ii in range(len(self.grid)):
             for jj in range(len(self.grid[ii])):
-                if self.grid[ii][jj] != '' and not self.grid[ii][jj].isNewOrganism:  # make sure something is there and new organism don't immediately get rules applied
+                # Makes sure something is there, new organism don't immediately get rules applied, and not all same DNA
+                if self.grid[ii][jj] != '' and not self.grid[ii][jj].isNewOrganism and not self.combust(ii,jj): 
                     self.grid[ii][jj].energy -=1
                     # Hydration rule
                     self.hydration(ii,jj)
