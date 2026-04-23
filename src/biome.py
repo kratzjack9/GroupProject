@@ -394,7 +394,7 @@ class Biome:
                     if self.grid[ii][jj].energy < 5:
                         self.grid[ii][jj].mutate()
                     # Predator rule
-                    self.predator(ii,jj,killing=True)
+                    self.predator(ii,jj,killing=False)
                     #Energy Death
                     if self.grid[ii][jj].energy <= 0 or not self.grid[ii][jj].isAlive:  # organism ceases
                         self.grid[ii][jj] = ''
