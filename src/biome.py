@@ -294,23 +294,25 @@ class Biome:
         column : int
             The row in which the Solar Flare rule is activated on
         """
-        multiple5 = ""
+        multiple5 = []
         for x in range(10):
             multiple5.append((x+1)*5)
         if self.cycleCount in multiple5:
             #Spot in grid:[row of spot,column of spot, {dictionary of dna}, hasPlant, exist]
             dnaSequence = self.infoCollector(row,column)
-            if "🌞" in dnaSequence["center"][3]:
+            if "🌞" in dnaSequence["center"][2]:
                 # Checks if adjacent spots have a plant
                 for key in dnaSequence:
                     if key != "center":
-                        if "🌱" in dnaSequence[key][3]:
-                            dnaSequence["center"][4] = True
+                        if "🌱" in dnaSequence[key][2]:
+                            dnaSequence["center"][3] = True
                 # Depending if adjacent spots have plants, gains or loses 10 energy
-                if dnaSequence["center"][4]:
-                    self.grid[dnaSequence["center"][0]][dnaSequence["center"][1]].energy =+ 10
+                if dnaSequence["center"][3]:
+                    self.grid[dnaSequence["center"][0]][dnaSequence["center"][1]].energy += 10
+                    print(f"[{row},{column}] has gained 10 energy")
                 else:
-                    self.grid[dnaSequence["center"][0]][dnaSequence["center"][1]].energy =- 10
+                    self.grid[dnaSequence["center"][0]][dnaSequence["center"][1]].energy -= 10
+                    print(f"[{row},{column}] has lost 10 energy")
 
                 
     def combust(self,row,column):
@@ -387,11 +389,12 @@ class Biome:
                     # Hydration rule
                     self.hydration(ii,jj)
                     # Solar flare rule
+                    self.solarFlare(ii,jj)
                     # Mutation rule
                     if self.grid[ii][jj].energy < 5:
                         self.grid[ii][jj].mutate()
                     # Predator rule
-                    self.predator(ii,jj,killing=False)
+                    self.predator(ii,jj,killing=True)
                     #Energy Death
                     if self.grid[ii][jj].energy <= 0 or not self.grid[ii][jj].isAlive:  # organism ceases
                         self.grid[ii][jj] = ''
