@@ -5,6 +5,7 @@ Game of life project with custom rules
 
 | Author: Collin, Eein, Kade, Tobias
 | Date: 2026 April 20
+
 """
 
 from random import choices, random, randint
@@ -47,14 +48,25 @@ class Organism:
             The amount of energy the organism starts with. Default is 100.
 
         """
-        # print("Organism initialized")
-        self.dna = choices(Organism.dnaOptions, k=3)
-        if self.dna in self.dnaCombust:
+
+        try:
+            if energy < 0:
+                 raise ValueError("Energy cannot be negative")
+            # print("Organism initialized")
+            self.dna = choices(Organism.dnaOptions, k=3)
+            if self.dna in self.dnaCombust:
+                self.isAlive = False
+            else:
+                self.isAlive = True
+            self.energy = energy
+            self.isNewOrganism = True
+
+        except ValueError as e:
+            print(f"Error creating organism: {e}")
+            self.energy = 0
             self.isAlive = False
-        else:
-            self.isAlive = True
-        self.energy = energy
-        self.isNewOrganism = True
+
+        
     
     def mutate(self):
         """
@@ -141,39 +153,47 @@ class Biome:
         column: int
             The column in which the hydration rule is activated on
         """
-        directionList = []
-        if '💧' in self.grid[row][column].dna:
-            #print(f'[{row},{column}] has water')
-            if row > 0:  # can check above
-                if self.grid[row-1][column] == '':
-                    # 30% Chance
-                    if random() < .3 :
-                        directionList.append("N")
-            if row < (self.rows - 1):  # can check below
-                if self.grid[row+1][column] == "":
-                    # 30% Chance
-                    if random() < .3 :
-                        directionList.append("S")
-            if column > 0:  # can check left
-                if self.grid[row][column-1] == "":
-                    # 30% Chance
-                    if random() < .3 : 
-                        directionList.append("W")
-            if column < (self.cols - 1):  # can check right
-                if self.grid[row][column+1] == "":
-                    # 30% Chance
-                    if random() < .3 :
-                        directionList.append("E")
-            if len(directionList) != 0:
-                self.grid[row][column].energy = (self.grid[row][column].energy)/(len(directionList)+1)
-            if "N" in directionList:
-                self.grid[row-1][column] = Organism(energy=self.grid[row][column].energy)
-            if "S" in directionList:
-                self.grid[row+1][column] = Organism(energy=self.grid[row][column].energy)
-            if "W" in directionList:
-                self.grid[row][column-1] = Organism(energy=self.grid[row][column].energy)
-            if "E" in directionList:
-                self.grid[row][column+1] = Organism(energy=self.grid[row][column].energy)
+
+        try:
+            directionList = []
+            if '💧' in self.grid[row][column].dna:
+                #print(f'[{row},{column}] has water')
+                if row > 0:  # can check above
+                    if self.grid[row-1][column] == '':
+                        # 30% Chance
+                        if random() < .3 :
+                            directionList.append("N")
+                if row < (self.rows - 1):  # can check below
+                    if self.grid[row+1][column] == "":
+                        # 30% Chance
+                        if random() < .3 :
+                            directionList.append("S")
+                if column > 0:  # can check left
+                    if self.grid[row][column-1] == "":
+                        # 30% Chance
+                        if random() < .3 : 
+                            directionList.append("W")
+                if column < (self.cols - 1):  # can check right
+                    if self.grid[row][column+1] == "":
+                        # 30% Chance
+                        if random() < .3 :
+                            directionList.append("E")
+                if len(directionList) != 0:
+                    self.grid[row][column].energy = (self.grid[row][column].energy)/(len(directionList)+1)
+                if "N" in directionList:
+                    self.grid[row-1][column] = Organism(energy=self.grid[row][column].energy)
+                if "S" in directionList:
+                    self.grid[row+1][column] = Organism(energy=self.grid[row][column].energy)
+                if "W" in directionList:
+                    self.grid[row][column-1] = Organism(energy=self.grid[row][column].energy)
+                if "E" in directionList:
+                    self.grid[row][column+1] = Organism(energy=self.grid[row][column].energy)
+
+        except AttributeError:
+            print(f"Invalid organism at [{row},{column}]")
+
+        except IndexError:
+            print(f"Out of bounds access at [{row},{column}]") 
 
     def predator(self,row,column,killing=True):
         """
@@ -321,6 +341,10 @@ class Biome:
             
                 
     
+
+     
+
+
     def step(self):
         """
         Implementation of all rules and reducing the energy of all Organisms
@@ -331,21 +355,25 @@ class Biome:
         # go through all the organisms
         for ii in range(len(self.grid)):
             for jj in range(len(self.grid[ii])):
+
                 # Makes sure something is there, new organism don't immediately get rules applied, and not all same DNA
-                if self.grid[ii][jj] != '' and not self.grid[ii][jj].isNewOrganism and not self.combust(ii,jj): 
-                    self.grid[ii][jj].energy -=1
-                    # Hydration rule
-                    self.hydration(ii,jj)
-                    # Solar flare rule
-                    # Mutation rule
-                    if self.grid[ii][jj].energy < 5:
-                        self.grid[ii][jj].mutate()
-                    # Predator rule
-                    self.predator(ii,jj,killing=False)
-                    #Energy Death
-                    if self.grid[ii][jj].energy <= 0 or not self.grid[ii][jj].isAlive:  # organism ceases
-                        self.grid[ii][jj] = ''
-                        print(f'Organism at [{ii},{jj}] ceased')
+                try:
+                    if self.grid[ii][jj] != '' and not self.grid[ii][jj].isNewOrganism and not self.combust(ii,jj): 
+                        self.grid[ii][jj].energy -=1
+                        # Hydration rule
+                        self.hydration(ii,jj)
+                        # Solar flare rule
+                        # Mutation rule
+                        if self.grid[ii][jj].energy < 5:
+                            self.grid[ii][jj].mutate()
+                        # Predator rule
+                        self.predator(ii,jj,killing=False)
+                        #Energy Death
+                        if self.grid[ii][jj].energy <= 0 or not self.grid[ii][jj].isAlive:  # organism ceases
+                            self.grid[ii][jj] = ''
+                            print(f'Organism at [{ii},{jj}] ceased')
+                except Exception as e:
+                    print(f"Error at [{ii},{jj}]: {e}")
         for ii in range(self.rows):
             for jj in range(self.cols):
                 if self.grid[ii][jj] != "" and self.grid[ii][jj].isNewOrganism:
@@ -369,9 +397,16 @@ def main():
     The primary running of the code
     """
 
+    # o1 = Organism()
+    # print(o1)
+
     myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
-    #myBiome.display()
+    myBiome.grid[0][0] = "not an organism"
+    myBiome.hydration(100, 100)
+
+    myBiome.display()
     for ii in range(10):
+
         myBiome.step()
 
 
