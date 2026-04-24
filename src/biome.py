@@ -463,7 +463,7 @@ def main():
     for ii in range(10):
 
         myBiome.step()
-
+        input("Press Enter for next cycle...")
 
 if __name__ == '__main__':
     main()
