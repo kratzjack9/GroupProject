@@ -455,8 +455,9 @@ def main():
     # print(o1)
 
     myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
-    myBiome.grid[0][0] = "not an organism"
-    myBiome.hydration(100, 100)
+    #myBiome.grid[0][0] = "not an organism"
+    
+    #myBiome.hydration(100, 100)
 
     myBiome.display()
     for ii in range(10):
