@@ -550,7 +550,10 @@ class Biome:
         # print("Displaying the biome")
         for ii in range(len(self.grid)):
             for jj in range(len(self.grid[ii])):
-                print(f'[{self.grid[ii][jj]}]\t', end='')
+                if self.grid[ii][jj] != "":
+                    print(f'[{self.grid[ii][jj]}]', end='\t')
+                else:
+                    print(f"[\t        ]",end="\t")
             print()
 
 
@@ -559,15 +562,8 @@ def main():
     The primary running of the code
     """
 
-    # o1 = Organism()
-    # print(o1)
-
     myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
-    #myBiome.grid[0][0] = "not an organism"
     
-    #myBiome.hydration(100, 100)
-
-    #myBiome.display()
     for ii in range(10):
 
         myBiome.step()
