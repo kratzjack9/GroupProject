@@ -121,6 +121,8 @@ class Biome:
     grid : 2D list
         The grid which holds Organisms
 
+    isEmpty : boolean
+        Tells if the grid is empty
     """
     def __init__(self, nRows=5, nCols=3, startEnergy=100,organismDna=""):
         """
@@ -137,12 +139,16 @@ class Biome:
         startEnergy : int
             The amount of start energy that Organisms have
 
+        isEmpty : boolean
+            Tells if the grid is empty
+
         """
         self.rows = nRows
         self.cols = nCols
         #List Comprehension Grid
         self.grid = [[ Organism(startEnergy,dna=organismDna) if random() > .5 else "" for _ in range(self.cols)] for _ in range(self.rows)]
         self.cycleCount = 0
+        self.isEmpty = False
         # print("Biome initialized")
     
     def hydration(self, row, column):
@@ -536,11 +542,15 @@ class Biome:
                 except Exception as e:
                     print(f"Error at [{ii},{jj}]: {e}")
 
+        emptySpot = 0
         for ii in range(self.rows):
             for jj in range(self.cols):
                 if self.grid[ii][jj] != "" and self.grid[ii][jj].isNewOrganism:
                     self.grid[ii][jj].isNewOrganism = False
-
+                if self.grid[ii][jj] == "":
+                    emptySpot += 1
+        if emptySpot == self.rows*self.cols:
+            self.isEmpty = True
         self.display()
     
     def display(self):
@@ -559,7 +569,7 @@ class Biome:
 
 def main():
     """
-    The primary running of the code
+    The primary running and start of the code
     """
     userRow = ""
     userCol = ""
@@ -577,7 +587,7 @@ def main():
     myBiome = Biome(nRows=userRow, nCols=userCol, startEnergy=100)
     #Allows for unlimited steps
     userInput = ""
-    while userInput != "Q":
+    while (userInput != "Q" and not myBiome.isEmpty):
         try:
             myBiome.step()
             if myBiome.cycleCount == 1:
@@ -588,6 +598,10 @@ def main():
             userInput = userInput.upper()
         except EOFError:
             print("Use Q to exit the program.")
+    if myBiome.isEmpty:
+        print(f"The Biome survived with {myBiome.cycleCount} days.")
+    if userInput == "Q":
+        print(f"The Biome was stopped at {myBiome.cycleCount} days.")
 
 if __name__ == '__main__':
     main()
