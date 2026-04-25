@@ -520,7 +520,7 @@ class Biome:
                         if self.grid[ii][jj].energy < 5:
                             self.grid[ii][jj].mutate()
                         # Predator rule
-                        self.predator(ii,jj,killing=False)
+                        self.predator(ii,jj,killing=True)
                         #Fruiting Rule
                         self.fruiting(ii,jj)
                         #Growth Rule
@@ -561,13 +561,33 @@ def main():
     """
     The primary running of the code
     """
+    userRow = ""
+    userCol = ""
+    while (type(userRow) != int and type(userCol) != int):
+        try:
+            userRow = int(input("Input how many rows for grid..."))
+            userCol = int(input("Input how many columns for grid..."))
+            
+        except ValueError:
+            print("Only input integers for rows and columns.")
+        except EOFError:
+            print("Only input integers for rows and columns.\nNo commands allowed")
 
-    myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
-    
-    for ii in range(10):
 
-        myBiome.step()
-        input("Press Enter for next cycle...")
+    myBiome = Biome(nRows=userRow, nCols=userCol, startEnergy=100)
+    #Allows for unlimited steps
+    userInput = ""
+    while userInput != "Q":
+        try:
+            myBiome.step()
+            if myBiome.cycleCount == 1:
+                userInput=input("Press Enter for next cycle...")
+            else:
+                userInput=input("Press Enter for next cycle or Q to exit...")
+            userInput = userInput.strip()
+            userInput = userInput.upper()
+        except EOFError:
+            print("Use Q to exit the program.")
 
 if __name__ == '__main__':
     main()
