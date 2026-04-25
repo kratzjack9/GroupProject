@@ -406,22 +406,30 @@ class Biome:
                 return
         # Keeping track of truths within "columns" from dnaSurrounding
         columnTrues = [0,0,0,0]
+        dictColumnTrues = {}
         #Using details about dnaSurrounding
-        if totalTrues < 3 and totalExists < 3:
+        if totalTrues >= 3 and totalExists >= 3:
             for i in range(4):
                 for dnaComponent in dnaSurrounding:
                     if dnaSurrounding[dnaComponent][i]:
                         columnTrues[i] += 1
+            for i in range(4):
+                if dictColumnTrues.get(f"{columnTrues[i]}") != None:
+                    dictColumnTrues[f"{columnTrues[i]}"] += 1
+                else:
+                    dictColumnTrues[f"{columnTrues[i]}"] = 1
+
             #If there are two columns with no trues, then it can't reproduce
-            if 0 in columnTrues:
-                columnTrues.remove()
-                if 0 in columnTrues:
-                    return
+            if dictColumnTrues["0"] >=2:
+                return
+            # Avoiding [3,1,1,1]
+            if dictColumnTrues["3"] == 1 and dictColumnTrues["1"] == 3:
+                return
             #To my knowledge, this is a sufficient enough conditions for what we want
             newDna = []
             for key in dnaSequence:
                 #Isn't the center and exists
-                if key != "center" and dnaSequence[key][4] and len(newDna) >= 3:
+                if key != "center" and dnaSequence[key][4] and len(newDna) <= 3:
                     #Adds a random piece of dna from neighbors
                     newDna.append(list(dnaSequence[key][2])[randint(0,len(dnaSequence[key][2])-1)])
 
