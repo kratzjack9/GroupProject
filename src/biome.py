@@ -512,7 +512,8 @@ class Biome:
                     if self.grid[ii][jj] != '' and not self.grid[ii][jj].isNewOrganism and not self.combust(ii,jj): 
                         self.grid[ii][jj].energy -=1
                         # Hydration rule
-                        self.hydration(ii,jj)
+                        if self.grid[ii][jj].energy > 0:
+                            self.hydration(ii,jj)
                         # Solar flare rule
                         self.solarFlare(ii,jj)
                         # Mutation rule
