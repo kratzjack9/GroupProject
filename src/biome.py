@@ -423,7 +423,7 @@ class Biome:
             if dictColumnTrues["0"] >=2:
                 return
             # Avoiding [3,1,1,1]
-            if dictColumnTrues["3"] == 1 and dictColumnTrues["1"] == 3:
+            if dictColumnTrues.get("3") == 1 and dictColumnTrues.get("1") == 3:
                 return
             #To my knowledge, this is a sufficient enough conditions for what we want
             newDna = []
