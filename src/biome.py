@@ -426,7 +426,7 @@ class Biome:
                     dictColumnTrues[f"{columnTrues[i]}"] = 1
 
             #If there are two columns with no trues, then it can't reproduce
-            if dictColumnTrues["0"] >=2:
+            if dictColumnTrues.get("0") >=2:
                 return
             # Avoiding columnTrues == [3,1,1,1]
             if dictColumnTrues.get("3") == 1 and dictColumnTrues.get("1") == 3:
