@@ -38,7 +38,7 @@ class Organism:
     dnaOptions = ['🌱','💧','🌞','🎄','🍊']
     dnaCombust = ["🌱🌱🌱","💧💧💧","🌞🌞🌞","🎄🎄🎄","🍊🍊🍊"]
 
-    def __init__(self, energy=100):
+    def __init__(self, energy=100,dna=""):
         """
         Initialize a new Organism instance.
 
@@ -53,10 +53,14 @@ class Organism:
             if energy < 0:
                  raise ValueError("Energy cannot be negative")
             # print("Organism initialized")
-            self.dna = choices(Organism.dnaOptions, k=3)
-            if self.dna in self.dnaCombust:
-                self.isAlive = False
+            if dna == "":
+                self.dna = choices(Organism.dnaOptions, k=3)
+                if self.dna in self.dnaCombust:
+                    self.isAlive = False
+                else:
+                    self.isAlive = True
             else:
+                self.dna = dna
                 self.isAlive = True
             self.energy = energy
             self.isNewOrganism = True
@@ -118,7 +122,7 @@ class Biome:
         The grid which holds Organisms
 
     """
-    def __init__(self, nRows=5, nCols=3, startEnergy=100):
+    def __init__(self, nRows=5, nCols=3, startEnergy=100,organismDna=""):
         """
         Initialize a new Biome instance
         
@@ -137,7 +141,7 @@ class Biome:
         self.rows = nRows
         self.cols = nCols
         #List Comprehension Grid
-        self.grid = [[ Organism(startEnergy) if random() > .5 else "" for _ in range(self.cols)] for _ in range(self.rows)]
+        self.grid = [[ Organism(startEnergy,dna=organismDna) if random() > .5 else "" for _ in range(self.cols)] for _ in range(self.rows)]
         self.cycleCount = 0
         # print("Biome initialized")
     
@@ -334,6 +338,23 @@ class Biome:
                     self.grid[dnaSequence["center"][0]][dnaSequence["center"][1]].energy -= 10
                     print(f"[{row},{column}] has lost 10 energy")
 
+    def growth(self,row,column):
+        """
+        Implements the growth rule at location row, column
+
+        Parameters
+        -------------
+        row : int
+            The row in which the rule is activated
+
+        column : int
+            The column in which the rule is activated
+        """
+        
+        if '🌱' in self.grid[row][column].dna and '💧' in self.grid[row][column].dna and '🌞' in self.grid[row][column].dna:
+            self.grid[row][column].dna[self.grid[row][column].dna.index('🌱')] = "🎄"
+            print(f"[{row},{column}] has grown to a tree")
+            
                 
     def combust(self,row,column):
         """
@@ -416,11 +437,15 @@ class Biome:
                         # Hydration rule
                         self.hydration(ii,jj)
                         # Solar flare rule
+                        self.solarFlare(ii,jj)
                         # Mutation rule
                         if self.grid[ii][jj].energy < 5:
                             self.grid[ii][jj].mutate()
                         # Predator rule
                         self.predator(ii,jj,killing=False)
+                        #Fruiting
+                        #Growth
+                        self.growth(ii,jj)
                         #Energy Death
                         if self.grid[ii][jj].energy <= 0 or not self.grid[ii][jj].isAlive:  # organism ceases
                             self.grid[ii][jj] = ''
@@ -454,7 +479,7 @@ def main():
     # o1 = Organism()
     # print(o1)
 
-    myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
+    myBiome = Biome(nRows=5, nCols=3, startEnergy=100,organismDna=['🌱','💧','🌞'])
     #myBiome.grid[0][0] = "not an organism"
     
     #myBiome.hydration(100, 100)
