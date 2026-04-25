@@ -375,7 +375,59 @@ class Biome:
         if '🎄' in self.grid[row][column].dna and '💧' in self.grid[row][column].dna and '🌞' in self.grid[row][column].dna and self.grid[row][column].energy <= 70 :
             self.grid[row][column].dna[self.grid[row][column].dna.index('🎄')] = "🍊"
             print(f"[{row},{column}] has fruited")
-            
+
+    def reproduction(self, row, column):
+        #Spot in grid:[row of spot,column of spot, {dictionary of dna}, boolean, exists]
+        dnaSequence = self.infoCollector(row,column)
+        #dnaComponent:[inNorth,inSouth,inWest,inEast]
+        dnaSurrounding = {'💧':[False,False,False,False],'🌞':[False,False,False,False],'🌱':[False,False,False,False]}
+        index = 0
+        totalTrues = 0
+        totalExists = 0
+        # Filling out the dnaSurrounding and details about it
+        for key in dnaSequence:
+            if key != "center":
+                for dnaComponent in dnaSurrounding:
+                    if dnaSequence[key][4]:
+                        if dnaComponent in dnaSequence[key][2]:
+                            dnaSurrounding[dnaComponent][index] = True
+                            totalTrues += 1
+                index += 1
+        for key in dnaSequence:
+            if key != "center":
+                if dnaSequence[key][4]:
+                    totalExists += 1
+                    
+        #If a component isn't available, then it can't reproduce
+        for dnaComponent in dnaSurrounding:
+            if True in dnaSurrounding[dnaComponent]:
+                pass
+            else:
+                return
+        # Keeping track of truths within "columns" from dnaSurrounding
+        columnTrues = [0,0,0,0]
+        #Using details about dnaSurrounding
+        if totalTrues < 3 and totalExists < 3:
+            for i in range(4):
+                for dnaComponent in dnaSurrounding:
+                    if dnaSurrounding[dnaComponent][i]:
+                        columnTrues[i] += 1
+            #If there are two columns with no trues, then it can't reproduce
+            if 0 in columnTrues:
+                columnTrues.remove()
+                if 0 in columnTrues:
+                    return
+            #To my knowledge, this is a sufficient enough conditions for what we want
+            newDna = []
+            for key in dnaSequence:
+                #Isn't the center and exists
+                if key != "center" and dnaSequence[key][4] and len(newDna) >= 3:
+                    #Adds a random piece of dna from neighbors
+                    newDna.append(list(dnaSequence[key][2])[randint(0,len(dnaSequence[key][2])-1)])
+
+            self.grid[row][column] = Organism(dna=newDna)
+            print(f"[{row},{column}] has been born")
+    
                 
     def combust(self,row,column):
         """
@@ -434,10 +486,6 @@ class Biome:
                         else:
                             dnaSequence[key][2][dnaComponent] = dnaSequence[key][2][dnaComponent] + 1
         return dnaSequence
-    
-
-     
-
 
     def step(self):
         """
@@ -464,14 +512,18 @@ class Biome:
                             self.grid[ii][jj].mutate()
                         # Predator rule
                         self.predator(ii,jj,killing=False)
-                        #Fruiting
+                        #Fruiting Rule
                         self.fruiting(ii,jj)
-                        #Growth
+                        #Growth Rule
                         self.growth(ii,jj)
                         #Energy Death
                         if self.grid[ii][jj].energy <= 0 or not self.grid[ii][jj].isAlive:  # organism ceases
                             self.grid[ii][jj] = ''
                             print(f'Organism at [{ii},{jj}] ceased')
+                    elif self.grid[ii][jj] == "":
+                        #Reproduction Rule
+                        self.reproduction(ii,jj)
+
                 except Exception as e:
                     print(f"Error at [{ii},{jj}]: {e}")
 
