@@ -93,7 +93,7 @@ class Organism:
         """
         The string returned when the Organism is a method that requires a string
         """
-        return ",".join(self.dna) + str(self.energy)
+        return f"{",".join(self.dna)} {self.energy:.2f}"
 
 class Biome:
     """
@@ -186,12 +186,16 @@ class Biome:
                     self.grid[row][column].energy = (self.grid[row][column].energy)/(len(directionList)+1)
                 if "N" in directionList:
                     self.grid[row-1][column] = Organism(energy=self.grid[row][column].energy)
+                    print(f"[{row},{column}] hydrated [{row-1},{column}]")
                 if "S" in directionList:
                     self.grid[row+1][column] = Organism(energy=self.grid[row][column].energy)
+                    print(f"[{row},{column}] hydrated [{row+1},{column}]")
                 if "W" in directionList:
                     self.grid[row][column-1] = Organism(energy=self.grid[row][column].energy)
+                    print(f"[{row},{column}] hydrated [{row},{column-1}]")
                 if "E" in directionList:
                     self.grid[row][column+1] = Organism(energy=self.grid[row][column].energy)
+                    print(f"[{row},{column}] hydrated [{row},{column+1}]")
 
         except AttributeError:
             print(f"Invalid organism at [{row},{column}]")
@@ -345,15 +349,32 @@ class Biome:
         Parameters
         -------------
         row : int
-            The row in which the rule is activated
+            The row in which the growth rule is activated
 
         column : int
-            The column in which the rule is activated
+            The column in which the growth rule is activated
         """
         
         if '🌱' in self.grid[row][column].dna and '💧' in self.grid[row][column].dna and '🌞' in self.grid[row][column].dna:
             self.grid[row][column].dna[self.grid[row][column].dna.index('🌱')] = "🎄"
             print(f"[{row},{column}] has grown to a tree")
+    
+    def fruiting(self,row,column):
+        """
+        Implements the fruiting rule at location row, column
+
+        Parameters
+        -------------
+        row : int
+            The row in which the fruiting rule is activated
+
+        column : int
+            The column in which the fruiting rule is activated
+        """
+        
+        if '🎄' in self.grid[row][column].dna and '💧' in self.grid[row][column].dna and '🌞' in self.grid[row][column].dna and self.grid[row][column].energy <= 70 :
+            self.grid[row][column].dna[self.grid[row][column].dna.index('🎄')] = "🍊"
+            print(f"[{row},{column}] has fruited")
             
                 
     def combust(self,row,column):
@@ -444,6 +465,7 @@ class Biome:
                         # Predator rule
                         self.predator(ii,jj,killing=False)
                         #Fruiting
+                        self.fruiting(ii,jj)
                         #Growth
                         self.growth(ii,jj)
                         #Energy Death
@@ -479,12 +501,12 @@ def main():
     # o1 = Organism()
     # print(o1)
 
-    myBiome = Biome(nRows=5, nCols=3, startEnergy=100,organismDna=['🌱','💧','🌞'])
+    myBiome = Biome(nRows=5, nCols=3, startEnergy=100)
     #myBiome.grid[0][0] = "not an organism"
     
     #myBiome.hydration(100, 100)
 
-    myBiome.display()
+    #myBiome.display()
     for ii in range(10):
 
         myBiome.step()
