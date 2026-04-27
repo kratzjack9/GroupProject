@@ -80,13 +80,16 @@ class Organism:
         This allows the Organism to change its dna and kills it is DNA is all the same
         """
         changingDna = randint(0,len(self.dna)-1)
-        newDna = ""
+        newDna = []
+        dnaString = ""
         for x in range(len(self.dna)):
             if x == changingDna:
-                newDna = newDna + self.dnaOptions[randint(0,len(self.dnaOptions)-1)]
+                newDna.append(self.dnaOptions[randint(0,len(self.dnaOptions)-1)])
+                dnaString = dnaString + newDna[x-1]
             else:
-                newDna = newDna + self.dna[x]
-        if newDna not in self.dnaCombust:
+                newDna.append(self.dna[x])
+                dnaString = dnaString + newDna[x-1]
+        if dnaString not in self.dnaCombust:
             self.dna = newDna
         else:
             self.isAlive = False
