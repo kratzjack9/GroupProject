@@ -22,9 +22,9 @@ class Organism:
 
     Attributes
     ------------
-    dna : str
+    dna : list
         The organism's dna. 
-        Is three characters long
+        Is three items long
 
     energy : int
         The amount of energy that organism has at that moment.
@@ -46,6 +46,9 @@ class Organism:
         -----------
         energy : int
             The amount of energy the organism starts with. Default is 100.
+
+        dna : str
+            Forced dna of an organism. Default is "" which allows for random DNA.
 
         """
 
@@ -403,7 +406,6 @@ class Biome:
             if key != "center":
                 if dnaSequence[key][4]:
                     totalExists += 1
-                    
         #If a component isn't available, then it can't reproduce
         for dnaComponent in dnaSurrounding:
             if True in dnaSurrounding[dnaComponent]:
@@ -426,7 +428,7 @@ class Biome:
                     dictColumnTrues[f"{columnTrues[i]}"] = 1
 
             #If there are two columns with no trues, then it can't reproduce
-            if dictColumnTrues.get("0") >=2:
+            if dictColumnTrues.get("0") != None or dictColumnTrues["0"] >=2:
                 return
             # Avoiding columnTrues == [3,1,1,1]
             if dictColumnTrues.get("3") == 1 and dictColumnTrues.get("1") == 3:
