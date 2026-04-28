@@ -34,7 +34,9 @@ class Organism:
 
     isNewOrganism : boolean
         Tells if the organism was just born to prevent rules applying immediately
+        
     """
+
     dnaOptions = ['🌱','💧','🌞','🎄','🍊']
     dnaCombust = ["🌱🌱🌱","💧💧💧","🌞🌞🌞","🎄🎄🎄","🍊🍊🍊"]
 
