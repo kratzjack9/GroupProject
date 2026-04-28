@@ -507,7 +507,7 @@ class Biome:
                             dnaSequence[key][2][dnaComponent] = dnaSequence[key][2][dnaComponent] + 1
         return dnaSequence
 
-    def step(self):
+    def step(self,killing=False):
         """
         Implementation of all rules and reducing the energy of all Organisms
         """
@@ -532,7 +532,7 @@ class Biome:
                         if self.grid[ii][jj].energy < 5:
                             self.grid[ii][jj].mutate()
                         # Predator rule
-                        self.predator(ii,jj,killing=True)
+                        self.predator(ii,jj,killing=killing)
                         #Fruiting Rule
                         self.fruiting(ii,jj)
                         #Growth Rule
@@ -595,7 +595,7 @@ def main():
     userInput = ""
     while (userInput != "Q" and not myBiome.isEmpty):
         try:
-            myBiome.step()
+            myBiome.step(killing=True)
             if myBiome.cycleCount == 1:
                 userInput=input("Press Enter for next cycle...")
             else:
