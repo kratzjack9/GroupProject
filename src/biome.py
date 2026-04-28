@@ -9,6 +9,7 @@ Game of life project with custom rules
 """
 
 from random import choices, random, randint
+import argparse
 
 
 class Organism:
@@ -509,7 +510,7 @@ class Biome:
                             dnaSequence[key][2][dnaComponent] = dnaSequence[key][2][dnaComponent] + 1
         return dnaSequence
 
-    def step(self):
+    def step(self,killing=False):
         """
         Implementation of all rules and reducing the energy of all Organisms
         """
@@ -534,7 +535,7 @@ class Biome:
                         if self.grid[ii][jj].energy < 5:
                             self.grid[ii][jj].mutate()
                         # Predator rule
-                        self.predator(ii,jj,killing=True)
+                        self.predator(ii,jj,killing=killing)
                         #Fruiting Rule
                         self.fruiting(ii,jj)
                         #Growth Rule
@@ -579,6 +580,11 @@ def main():
     """
     The primary running and start of the code
     """
+    
+    parser = argparse.ArgumentParser(description="Creates a biome with organisms")
+    parser.add_argument('-k', '--killing', action="store_false",default=True, help="Tells if the killing, if part of the Predator Rule. Default: True")
+    args = parser.parse_args()
+
     userRow = ""
     userCol = ""
     while (type(userRow) != int and type(userCol) != int):
@@ -591,13 +597,12 @@ def main():
         except EOFError:
             print("Only input integers for rows and columns.\nNo commands allowed")
 
-
     myBiome = Biome(nRows=userRow, nCols=userCol, startEnergy=100)
     #Allows for unlimited steps
     userInput = ""
     while (userInput != "Q" and not myBiome.isEmpty):
         try:
-            myBiome.step()
+            myBiome.step(killing=args.killing)
             if myBiome.cycleCount == 1:
                 userInput=input("Press Enter for next cycle...")
             else:
