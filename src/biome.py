@@ -9,6 +9,7 @@ Game of life project with custom rules
 """
 
 from random import choices, random, randint
+import argparse
 
 
 class Organism:
@@ -577,6 +578,11 @@ def main():
     """
     The primary running and start of the code
     """
+    
+    parser = argparse.ArgumentParser(description="Creates a biome with organisms")
+    parser.add_argument('-k', '--killing', action="store_false",default=True, help="Tells if the killing, if part of the Predator Rule. Default: True")
+    args = parser.parse_args()
+
     userRow = ""
     userCol = ""
     while (type(userRow) != int and type(userCol) != int):
@@ -589,13 +595,12 @@ def main():
         except EOFError:
             print("Only input integers for rows and columns.\nNo commands allowed")
 
-
     myBiome = Biome(nRows=userRow, nCols=userCol, startEnergy=100)
     #Allows for unlimited steps
     userInput = ""
     while (userInput != "Q" and not myBiome.isEmpty):
         try:
-            myBiome.step(killing=True)
+            myBiome.step(killing=args.killing)
             if myBiome.cycleCount == 1:
                 userInput=input("Press Enter for next cycle...")
             else:
